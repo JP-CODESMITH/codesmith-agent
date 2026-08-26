@@ -16,7 +16,7 @@ export function ToolCall({ call }: ToolCallProps) {
       <pre className="text-xs text-gray-600 dark:text-gray-400 overflow-x-auto">
         {JSON.stringify(call.input, null, 2)}
       </pre>
-      {call.result && (
+      {call.result !== undefined && call.result !== null && (
         <pre className="mt-2 text-xs text-green-600 dark:text-green-400 overflow-x-auto">
           {JSON.stringify(call.result, null, 2)}
         </pre>
