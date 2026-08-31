@@ -1,6 +1,6 @@
 # CodeSmith Agent
 
-A local-first AI developer agent with a browser-based interface.
+A local-first AI developer agent with browser and terminal interfaces.
 
 > **"An AI developer living in your local terminal, with a modern browser interface."**
 
@@ -8,26 +8,32 @@ A local-first AI developer agent with a browser-based interface.
 
 ```bash
 bun install
-bun dev
+bun run cli
+```
+
+For the existing browser UI:
+
+```bash
+bun run dev
 # Opens at http://localhost:3000
 ```
 
 ## What It Does
 
-- Start from terminal, get a browser UI
-- Enter a natural language goal
-- Agent plans, selects tools, executes locally, reasons, repeats
-- Final result appears in the browser
+- Start the OpenTUI terminal interface with `bun run cli`
+- Run the existing browser UI with `bun run dev`
+- Track project context, session state, tool definitions, and permission policy
+- Prepare for provider-backed agent turns without hard-coding secrets
 
 ## Tech Stack
 
-Bun + TanStack Start + React 19 + Tailwind CSS v4 + TypeScript + Docker sandbox
+Bun + TypeScript + OpenTUI + TanStack Start + React 19 + Tailwind CSS v4
 
 ## Documentation
 
 **Full documentation: [CODESMITH.md](./CODESMITH.md)**
 
-Covers architecture, agent loop, AI providers, tool system, sandbox, MCP, frontend, project structure, security model, and implementation roadmap.
+Covers the current Phase 1 architecture, TUI, agent core, AI providers, tool system, security boundary, project detection, and implementation limits.
 
 ## Configuration
 
