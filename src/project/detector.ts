@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { basename, join, resolve } from 'node:path'
 import type { ProjectContext, ProjectType } from './context'
 
 const projectMarkers: Array<{ file: string; type: ProjectType }> = [
@@ -25,6 +25,37 @@ const entryPointCandidates = [
   'src/server/agent/agent.ts',
 ]
 
+function detectRuntime(files: string[]): string | undefined {
+  if (files.includes('bun.lock')) return 'bun'
+  if (files.includes('package.json')) return 'node'
+  return undefined
+}
+
+function detectLanguage(files: string[]): string | undefined {
+  if (files.includes('tsconfig.json')) return 'typescript'
+  if (files.includes('package.json')) return 'javascript'
+  if (files.includes('pyproject.toml') || files.includes('requirements.txt')) {
+    return 'python'
+  }
+  if (files.includes('pubspec.yaml')) return 'dart'
+  return undefined
+}
+
+function detectFramework(files: string[]): string | undefined {
+  if (files.some((file) => file.startsWith('vite.config.'))) return 'vite'
+  if (files.some((file) => file.startsWith('next.config.'))) return 'next'
+  if (files.includes('pubspec.yaml')) return 'flutter'
+  return undefined
+}
+
+function detectBuildTool(files: string[]): string | undefined {
+  if (files.some((file) => file.startsWith('vite.config.'))) return 'vite'
+  if (files.includes('Dockerfile') || files.includes('docker-compose.yml')) {
+    return 'docker'
+  }
+  return undefined
+}
+
 export function detectProject(projectRoot = process.cwd()): ProjectContext {
   const root = resolve(projectRoot)
   const configFiles: string[] = []
@@ -43,6 +74,12 @@ export function detectProject(projectRoot = process.cwd()): ProjectContext {
 
   return {
     root,
+    name: basename(root),
+    runtime: detectRuntime(configFiles),
+    language: detectLanguage(configFiles),
+    framework: detectFramework(configFiles),
+    buildTool: detectBuildTool(configFiles),
+    files: configFiles,
     types: Array.from(types),
     packageManager: existsSync(join(root, 'bun.lock')) ? 'bun' : undefined,
     hasGit: existsSync(join(root, '.git')),
