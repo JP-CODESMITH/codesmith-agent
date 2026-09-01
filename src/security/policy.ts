@@ -1,5 +1,7 @@
 import type { PermissionRequest, PermissionResult } from './types'
 
+// Denied commands are blocked outright because they are system or disk level
+// operations that should not run through an early-stage agent.
 const deniedCommandPatterns = [
   /\bmkfs(\.\w+)?\b/i,
   /\bdd\b/i,
@@ -7,6 +9,8 @@ const deniedCommandPatterns = [
   /\breboot\b/i,
 ]
 
+// Approval-required commands can be legitimate for a developer, but not safe
+// for the agent to execute without explicit user confirmation.
 const approvalCommandPatterns = [
   /\bsudo\b/i,
   /\brm\b/i,

@@ -9,6 +9,8 @@ import { detectProject } from '~/project/detector'
 import { runAgentTurn } from './loop'
 import type { AgentRunResult } from './types'
 
+// This registry is the default Phase 1 tool surface.
+// The agent receives tool definitions, but it does not invoke them autonomously yet.
 export function createDefaultToolRegistry() {
   return createToolRegistry([
     ...filesystemTools,
@@ -21,6 +23,8 @@ export async function runCodeSmithAgentTurn(
   message: string,
   projectRoot = process.cwd(),
 ): Promise<AgentRunResult> {
+  // A fresh in-memory session is created for each Phase 1 turn.
+  // Persistence and multi-turn recovery are intentionally deferred.
   const project = detectProject(projectRoot)
   const session = createCodeSmithSession(project)
 

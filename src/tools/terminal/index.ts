@@ -32,6 +32,8 @@ export const executeCommandTool: Tool<
       return { ok: false, error: `User approval required: ${permission.reason}` }
     }
 
+    // Commands only reach this point after policy classification.
+    // This is still local execution, not the future production sandbox.
     return new Promise((resolve) => {
       const proc = spawn('bash', ['-lc', input.command], {
         cwd: input.cwd ?? context.cwd,

@@ -55,6 +55,7 @@ export async function runCodeSmithTui(options: TuiOptions): Promise<void> {
   const project = detectProject(options.projectPath)
   let session = createCodeSmithSession(project)
 
+  // Smoke mode lets automated checks verify the CLI path without opening a TTY UI.
   if (!process.stdin.isTTY || process.argv.includes('--smoke')) {
     process.stdout.write(`CodeSmith Agent TUI\n${formatProjectSummary(session)}\n`)
     return
@@ -66,6 +67,8 @@ export async function runCodeSmithTui(options: TuiOptions): Promise<void> {
     backgroundColor: '#0B1020',
   })
 
+  // The render tree is deliberately small: a frame, text areas, status line,
+  // and one input. Richer panels can be added without changing agent state.
   const root = new BoxRenderable(renderer, {
     width: '100%',
     height: '100%',
@@ -113,6 +116,7 @@ export async function runCodeSmithTui(options: TuiOptions): Promise<void> {
   })
 
   function refresh(): void {
+    // OpenTUI renderables update when their content properties change.
     header.content = `CodeSmith Agent                              * ${statusLabel(session)}`
     body.content = renderConversation(session)
     status.content = `${renderToolStatus(session)} | q or Ctrl+C exits safely`
@@ -130,6 +134,7 @@ export async function runCodeSmithTui(options: TuiOptions): Promise<void> {
     }
     refresh()
 
+    // The TUI calls the shared agent loop directly; no HTTP server is required.
     const result = await runAgentTurn(
       {
         session,

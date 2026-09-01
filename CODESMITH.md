@@ -60,6 +60,9 @@ src/
   index.ts            CLI entry point
 ```
 
+For a beginner-friendly reading path through the Phase 1 files, see
+`docs/PHASE1-WALKTHROUGH.md`.
+
 ## TUI Architecture
 
 The terminal interface uses `@opentui/core` directly. It is intentionally not

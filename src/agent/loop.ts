@@ -9,6 +9,8 @@ export async function runAgentTurn(
   const state = new AgentStateStore(options.session)
 
   try {
+    // Phase 1 handles one turn: record user input, call the provider,
+    // record the assistant output. Planning/tool execution comes later.
     state.addMessage('user', input.message)
     state.setState('thinking')
 
@@ -19,6 +21,8 @@ export async function runAgentTurn(
 
     const response = await options.aiProvider.sendMessage({
       messages,
+      // Tools are exposed as definitions only. The placeholder provider ignores them,
+      // but real providers will use this contract later.
       tools: options.tools.list().map((tool) => ({
         name: tool.name,
         description: tool.description,
