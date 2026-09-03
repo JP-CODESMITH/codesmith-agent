@@ -157,6 +157,8 @@ export async function runCodeSmithTui(options: TuiOptions): Promise<void> {
   renderer.keyInput.on('keypress', (key) => {
     if (key.name === 'q' && !input.value) {
       renderer.destroy()
+    } else if (key.name === '/') {
+
     }
   })
 

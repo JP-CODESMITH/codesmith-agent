@@ -1,3 +1,6 @@
+// Type definitions for the sandbox subsystem (isolated command/file execution).
+
+// Configuration for provisioning a sandbox (image and resource limits).
 export interface SandboxOptions {
   image?: string
   memoryLimit?: string
@@ -5,6 +8,7 @@ export interface SandboxOptions {
   timeout?: number
 }
 
+// Contract for an isolated environment: lifecycle, command exec, and file I/O.
 export interface Sandbox {
   id: string
   create(options?: SandboxOptions): Promise<void>

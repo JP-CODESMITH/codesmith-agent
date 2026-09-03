@@ -1,7 +1,12 @@
+// Project detector: inspects a directory for well-known config files and
+// derives a ProjectContext (runtime, language, framework, build tool, etc.).
+// This is how the agent learns what kind of workspace it is operating in.
 import { existsSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 import type { ProjectContext, ProjectType } from './context'
 
+// Marker table: presence of each file on disk implies the associated project
+// type. Ordering is informational only — all matches are collected.
 const projectMarkers: Array<{ file: string; type: ProjectType }> = [
   { file: 'bun.lock', type: 'bun' },
   { file: 'package.json', type: 'node' },
