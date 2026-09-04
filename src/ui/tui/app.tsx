@@ -1,14 +1,14 @@
-import { createCliRenderer } from '@opentui/core'
-import { createRoot } from '@opentui/react'
-import { useState, useCallback } from 'react'
-import { useKeyboard, useRenderer } from '@opentui/react'
-import { createAIProvider } from '~/ai/provider'
-import { runAgentTurn } from '~/agent/loop'
-import { createDefaultToolRegistry } from '~/agent/agent'
-import { detectProject } from '~/project/detector'
-import { permissionGate } from '~/security/permissions'
-import { createCodeSmithSession } from '~/session/session'
-import type { CodeSmithSession } from '~/session/types'
+import { createCliRenderer } from "@opentui/core"
+import { createRoot } from "@opentui/react"
+import { useState, useCallback } from "react"
+import { useKeyboard, useRenderer } from "@opentui/react"
+import { createAIProvider } from "~/ai/provider"
+import { runAgentTurn } from "~/agent/loop"
+import { createDefaultToolRegistry } from "~/agent/agent"
+import { detectProject } from "~/project/detector"
+import { permissionGate } from "~/security/permissions"
+import { createCodeSmithSession } from "~/session/session"
+import type { CodeSmithSession } from "~/session/types"
 
 export interface TuiOptions {
   projectPath: string
@@ -16,10 +16,10 @@ export interface TuiOptions {
 
 // Determine the status label from the current session state
 function getStatusLabel(session: CodeSmithSession): string {
-  if (session.errors.length > 0) return 'Error'
-  if (session.state === 'thinking') return 'Thinking'
-  if (session.state === 'executing') return 'Running'
-  return 'Ready'
+  if (session.errors.length > 0) return "Error"
+  if (session.state === "thinking") return "Thinking"
+  if (session.state === "executing") return "Running"
+  return "Ready"
 }
 
 // Main TUI entry point
@@ -28,7 +28,7 @@ export async function runCodeSmithTui(options: TuiOptions): Promise<void> {
   const session = createCodeSmithSession(project)
 
   // Smoke mode: run without TTY for automated testing/CI checks
-  if (!process.stdin.isTTY || process.argv.includes('--smoke')) {
+  if (!process.stdin.isTTY || process.argv.includes("--smoke")) {
     process.stdout.write(`CodeSmith Agent TUI\n`)
     return
   }
@@ -37,7 +37,7 @@ export async function runCodeSmithTui(options: TuiOptions): Promise<void> {
   const renderer = await createCliRenderer({
     exitOnCtrlC: true,
     targetFps: 30,
-    backgroundColor: '#0B1020',
+    backgroundColor: "#0B1020",
   })
 
   const root = createRoot(renderer as any)
@@ -54,7 +54,8 @@ interface AppProps {
 // Root React component that manages the TUI state and layout
 function App({ session }: AppProps) {
   const [currentSession, setCurrentSession] = useState(session)
-  const [inputValue, setInputValue] = useState('')
+  const [inputValue, setInputValue] = useState("")
+  const [opentools, setOpentools] = useState(false)
   const renderer = useRenderer()
 
   // Handle user message submission: call the agent turn and update session
@@ -62,10 +63,10 @@ function App({ session }: AppProps) {
     const message = inputValue.trim()
     if (!message) return
 
-    setInputValue('')
+    setInputValue("")
     setCurrentSession((prev) => ({
       ...prev,
-      state: 'thinking',
+      state: "thinking",
       updatedAt: Date.now(),
     }))
 
@@ -73,7 +74,7 @@ function App({ session }: AppProps) {
     const result = await runAgentTurn(
       {
         session: currentSession,
-        aiProvider: createAIProvider({ provider: 'placeholder' }),
+        aiProvider: createAIProvider({ provider: "placeholder" }),
         permissions: permissionGate,
         tools: createDefaultToolRegistry(),
       },
@@ -85,17 +86,23 @@ function App({ session }: AppProps) {
 
   // Handle 'q' key to quit the application
   useKeyboard((key) => {
-    if (key.name === 'q' && !inputValue) {
+    if (key.name === "q" && !inputValue) {
       renderer.destroy()
     }
   })
 
-  const TuiBox = 'box' as any
-  const TuiText = 'text' as any
-  const TuiInput = 'input' as any
+  const TuiBox = "box" as any
+  const TuiText = "text" as any
+  const TuiInput = "input" as any
 
   return (
-    <TuiBox flexDirection="column" backgroundColor="#0B1020" padding={1} width="100%" height="100%">
+    <TuiBox
+      flexDirection="column"
+      backgroundColor="#0B1020"
+      padding={1}
+      width="100%"
+      height="100%"
+    >
       {/* Main frame with border */}
       <TuiBox
         flexDirection="column"
@@ -134,6 +141,24 @@ function App({ session }: AppProps) {
           onChange={(e: any) => setInputValue(e.value ?? e)}
           onSubmit={handleSubmit}
         />
+
+        {/* Expanded tools panel when opentools is toggled */}
+        {opentools && (
+          <TuiBox
+            flexDirection="column"
+            border
+            borderStyle="rounded"
+            borderColor="#6EA8FE"
+            backgroundColor="#0B1020"
+            width="100%"
+            height={10}
+            padding={1}
+          >
+            <TuiText fg="#8FF0A4" height={1}>
+              Tools panel active — toggle with q to return
+            </TuiText>
+          </TuiBox>
+        )}
       </TuiBox>
     </TuiBox>
   )
@@ -142,46 +167,46 @@ function App({ session }: AppProps) {
 // Render the conversation messages as a formatted string
 function renderConversation(session: CodeSmithSession): string {
   const lines = session.messages.flatMap((message) => {
-    const label = message.role === 'user' ? 'You' : 'CodeSmith'
+    const label = message.role === "user" ? "You" : "CodeSmith"
     return [`${label} > ${message.content}`]
   })
 
   if (lines.length === 0) {
     return [
       formatProjectSummary(session),
-      '',
-      'You >',
-      '',
-      'CodeSmith > Phase 1 terminal foundation is ready.',
-    ].join('\n')
+      "",
+      "You >",
+      "",
+      "CodeSmith > Phase 1 terminal foundation is ready.",
+    ].join("\n")
   }
 
   // Show only the last 16 messages to keep the display manageable
-  return lines.slice(-16).join('\n')
+  return lines.slice(-16).join("\n")
 }
 
 // Render the most recent tool execution status
 function renderToolStatus(session: CodeSmithSession): string {
-  if (session.tools.length === 0) return 'Tools: idle'
+  if (session.tools.length === 0) return "Tools: idle"
   const lastTool = session.tools.at(-1)
-  if (!lastTool) return 'Tools: idle'
-  return `Tool: ${lastTool.toolName} ${lastTool.result?.ok ? 'completed' : 'failed'}`
+  if (!lastTool) return "Tools: idle"
+  return `Tool: ${lastTool.toolName} ${lastTool.result?.ok ? "completed" : "failed"}`
 }
 
 // Format a human-readable project summary string
 function formatProjectSummary(session: CodeSmithSession): string {
   const types = session.project.types.length
-    ? session.project.types.join(', ')
-    : 'unknown'
+    ? session.project.types.join(", ")
+    : "unknown"
   const entries = session.project.entryPoints.length
-    ? session.project.entryPoints.join(', ')
-    : 'none detected'
+    ? session.project.entryPoints.join(", ")
+    : "none detected"
 
   return [
     `Project: ${session.project.root}`,
     `Type: ${types}`,
-    `Package manager: ${session.project.packageManager ?? 'unknown'}`,
-    `Git: ${session.project.hasGit ? 'yes' : 'no'}`,
+    `Package manager: ${session.project.packageManager ?? "unknown"}`,
+    `Git: ${session.project.hasGit ? "yes" : "no"}`,
     `Entry points: ${entries}`,
-  ].join('\n')
+  ].join("\n")
 }
