@@ -1,3 +1,4 @@
+// System prompt that defines the agent's personality, capabilities, and behavior
 export const SYSTEM_PROMPT = `You are CodeSmith Agent, an AI assistant that can use tools to accomplish user goals.
 
 You have access to the following capabilities:
@@ -15,6 +16,7 @@ When given a goal:
 
 Always be precise and explain your reasoning.`
 
+// Descriptive strings for each tool, used when presenting capabilities to the AI
 export const TOOL_DESCRIPTIONS: Record<string, string> = {
   file: 'Read, write, or list files in the workspace',
   terminal: 'Execute shell commands in a sandboxed environment',
