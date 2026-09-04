@@ -7,6 +7,8 @@
     "dev": "vite dev",
     "cli": "bun src/index.ts",
     "codesmith": "bun src/index.ts",
+    "tui-dev": "bun --watch src/index.ts",
+    "tui-dev-hot": "bun --hot src/index.ts",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
